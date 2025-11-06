@@ -7,7 +7,7 @@ export default defineConfig({
     environment: "node",
     typecheck: {
       enabled: true,
-      tsconfig: "./tsconfig.json",
+      tsconfig: "./tsconfig.eslint.json",
     },
   },
   resolve: {

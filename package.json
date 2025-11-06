@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Personal finance platform demonstrating DDD, Event-Driven architecture, and Effect-TS",
+  "description": "fintech-focused demo showcasing DDD, Event-based Design, FP, and CI/CD practices",
   "scripts": {
     "test:plaid": "tsx plaid-sandbox-test.ts",
     "build": "pnpm -r run build",
