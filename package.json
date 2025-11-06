@@ -1,0 +1,32 @@
+{
+  "name": "simplicity-finance-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal finance platform demonstrating DDD, Event-Driven architecture, and Effect-TS",
+  "scripts": {
+    "test:plaid": "tsx plaid-sandbox-test.ts",
+    "build": "pnpm -r run build",
+    "dev": "pnpm --filter @udmada/finance-client dev",
+    "test": "pnpm -r run test",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "pnpm exec eslint packages *.mjs",
+    "format": "pnpm -r run format",
+    "format:check": "pnpm -r run format:check"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^22.9.0",
+    "@typescript-eslint/eslint-plugin": "^8.9.0",
+    "@typescript-eslint/parser": "^8.9.0",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "plaid": "^27.0.0",
+    "prettier": "^3.3.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.3"
+  }
+}

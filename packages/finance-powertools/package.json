@@ -1,0 +1,63 @@
+{
+  "name": "@udmada/finance-powertools",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Observability and resilience layers for Effect-based applications (inspired by AWS Lambda Powertools)",
+  "keywords": [
+    "effect-ts",
+    "observability",
+    "logging",
+    "tracing",
+    "metrics",
+    "idempotency",
+    "powertools",
+    "opentelemetry"
+  ],
+  "author": "Adam Du",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "main": "./dist/esm/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:types": "vitest run --typecheck.only",
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm exec eslint src --ext .ts",
+    "format": "pnpm exec prettier --write src",
+    "format:check": "pnpm exec prettier --check src"
+  },
+  "dependencies": {
+    "effect": "^3.10.14"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5",
+    "@vitest/ui": "^2.1.5"
+  },
+  "peerDependencies": {
+    "effect": "^3.0.0"
+  },
+  "optionalDependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-trace-node": "^1.28.0",
+    "@opentelemetry/sdk-trace-base": "^1.28.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.54.0"
+  }
+}
