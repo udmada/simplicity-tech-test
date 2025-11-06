@@ -23,6 +23,11 @@
       "types": "./dist/esm/effect/index.d.ts",
       "import": "./dist/esm/effect/index.js",
       "require": "./dist/cjs/effect/index.js"
+    },
+    "./infrastructure": {
+      "types": "./dist/esm/infrastructure/index.d.ts",
+      "import": "./dist/esm/infrastructure/index.js",
+      "require": "./dist/cjs/infrastructure/index.js"
     }
   },
   "main": "./dist/esm/index.js",
