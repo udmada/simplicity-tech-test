@@ -1,0 +1,12 @@
+name = "finance-dashboard"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "./build/client"
+
+# Development environment variables (for local testing)
+[vars]
+NODE_ENV = "development"
+
+# Production secrets should be set via:
+# npx wrangler secret put PLAID_CLIENT_ID
+# npx wrangler secret put PLAID_SECRET
+# npx wrangler secret put SANDBOX_ACCESS_TOKEN

@@ -6,7 +6,6 @@
   "author": "udmada <git@adamdu.nz>",
   "description": "fintech-focused demo showcasing DDD, Event-based Design, FP, and CI/CD practices",
   "scripts": {
-    "test:plaid": "tsx plaid-sandbox-test.ts",
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
     "typecheck": "pnpm -r run typecheck",
