@@ -1,5 +1,5 @@
 import { defineConfig } from "vitest/config";
-import path from "path";
+import path from "node:path";
 
 export default defineConfig({
   test: {
@@ -9,6 +9,7 @@ export default defineConfig({
       enabled: true,
       tsconfig: "./tsconfig.eslint.json",
     },
+    reporters: [["tree", { summary: false }]],
   },
   resolve: {
     alias: {

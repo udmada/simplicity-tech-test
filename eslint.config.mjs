@@ -12,6 +12,8 @@ const tsProjects = [
   "./packages/finance-powertools/tsconfig.json",
   "./packages/finance-powertools/tsconfig.eslint.json",
   "./packages/finance-powertools/tsconfig.cjs.json",
+  "./apps/web/tsconfig.json",
+  "./apps/web/tsconfig.eslint.json",
 ];
 
 export default tseslint.config(
@@ -35,15 +37,15 @@ export default tseslint.config(
   // TypeScript configs with files scope
   ...tseslint.configs.recommended.map((config) => ({
     ...config,
-    files: ["**/*.ts"],
+    files: ["**/*.ts", "**/*.tsx"],
   })),
   ...tseslint.configs.recommendedTypeChecked.map((config) => ({
     ...config,
-    files: ["**/*.ts"],
+    files: ["**/*.ts", "**/*.tsx"],
   })),
   // TypeScript-specific overrides
   {
-    files: ["**/*.ts"],
+    files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parserOptions: {
         project: tsProjects.map((project) => path.resolve(__dirname, project)),

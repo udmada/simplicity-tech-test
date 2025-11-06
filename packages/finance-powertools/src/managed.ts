@@ -23,7 +23,7 @@ export type PowertoolsRuntime = ManagedRuntime.ManagedRuntime<never, never>;
 /**
  * Create development runtime with powertools
  *
- * @example
+ * @usage
  * ```typescript
  * import { createDevelopmentRuntime } from '@udmada/finance-powertools';
  *
@@ -45,7 +45,7 @@ export const createDevelopmentRuntime = (
 /**
  * Create production runtime with powertools
  *
- * @example
+ * @usage
  * ```typescript
  * import { createProductionRuntime } from '@udmada/finance-powertools';
  *
@@ -71,7 +71,7 @@ export const createProductionRuntime = (
 /**
  * Create custom runtime from individual layers
  *
- * @example
+ * @usage
  * ```typescript
  * import { createCustomRuntime, consoleLoggerLayer, nativeTracerLayer, noOpIdempotencyLayer } from '@udmada/finance-powertools';
  * import { Layer } from 'effect';
@@ -94,7 +94,7 @@ export const createCustomRuntime = (
 /**
  * Run an Effect with a powertools runtime
  *
- * @example
+ * @usage
  * ```typescript
  * const runtime = createDevelopmentRuntime();
  * const result = await runWithPowertools(runtime, myEffect);
@@ -108,7 +108,7 @@ export const runWithPowertools = <A>(
 /**
  * Convenience wrapper that applies powertools to an effect
  *
- * @example
+ * @usage
  * ```typescript
  * import { withPowertools } from '@udmada/finance-powertools';
  *
@@ -129,7 +129,7 @@ export const withPowertools = <A>(
 /**
  * Production version of withPowertools
  *
- * @example
+ * @usage
  * ```typescript
  * import { withProductionPowertools } from '@udmada/finance-powertools';
  *

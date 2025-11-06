@@ -43,7 +43,7 @@ export interface ProductionPowertoolsOptions {
  *
  * Provides console-based logging, native tracing, console metrics, and in-memory idempotency.
  *
- * @example
+ * @usage
  * ```typescript
  * import { developmentPowertoolsLayer } from '@udmada/finance-powertools';
  * import { Effect } from 'effect';
@@ -75,7 +75,7 @@ export const developmentPowertoolsLayer = (
  *
  * Provides structured logging, OTEL tracing, and configurable idempotency.
  *
- * @example
+ * @usage
  * ```typescript
  * import { productionPowertoolsLayer } from '@udmada/finance-powertools';
  * import { Effect } from 'effect';
@@ -118,7 +118,7 @@ export const productionPowertoolsLayer = (
  *
  * Build a layer from individual observability and resilience layers.
  *
- * @example
+ * @usage
  * ```typescript
  * import { customPowertoolsLayer } from '@udmada/finance-powertools';
  * import { consoleLoggerLayer, nativeTracerLayer } from '@udmada/finance-powertools';
