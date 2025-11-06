@@ -4,6 +4,7 @@
     "module": "CommonJS",
     "outDir": "./dist/cjs",
     "moduleResolution": "node",
+    "verbatimModuleSyntax": false,
     "declaration": false,
     "declarationMap": false
   }

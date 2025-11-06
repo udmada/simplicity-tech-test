@@ -33,6 +33,9 @@ importers:
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.1(jiti@2.6.1))
+      plaid:
+        specifier: ^39.1.0
+        version: 39.1.0
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
