@@ -224,8 +224,11 @@ export const mapPlaidAccountToDomain = (
       });
     }
 
+    // Round to 2 decimal places to match Money schema constraint
+    const roundedAmount = Math.round(amount * 100) / 100;
+
     return pipe(
-      Money(amount, currency),
+      Money(roundedAmount, currency),
       Effect.mapError(
         (error): PlaidAccountMappingError => ({
           _tag: "AccountBalanceInvalid",
@@ -245,8 +248,11 @@ export const mapPlaidAccountToDomain = (
       return Effect.succeed<MoneyValue | null>(null);
     }
 
+    // Round to 2 decimal places to match Money schema constraint
+    const roundedAmount = Math.round(amount * 100) / 100;
+
     return pipe(
-      Money(amount, currency),
+      Money(roundedAmount, currency),
       Effect.mapError(
         (error): PlaidAccountMappingError => ({
           _tag: "AccountBalanceInvalid",
@@ -316,8 +322,11 @@ export const mapPlaidTransactionToDomain = (
 
   const currency: Currency = currencyLiteral;
 
+  // Round to 2 decimal places to match Money schema constraint
+  const roundedAmount = Math.round(plaidTransaction.amount * 100) / 100;
+
   return pipe(
-    Money(plaidTransaction.amount, currency),
+    Money(roundedAmount, currency),
     Effect.mapError(
       (error): PlaidTransactionMappingError => ({
         _tag: "TransactionInvalidAmount",

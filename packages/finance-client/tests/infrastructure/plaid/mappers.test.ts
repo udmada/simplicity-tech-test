@@ -163,20 +163,31 @@ describe("Plaid mappers", () => {
     }
   });
 
-  it("fails when transaction amount violates money precision", async () => {
+  it("rounds transaction amounts to 2 decimal places", async () => {
     const txn = {
       ...plaidTransactionFixture,
-      amount: 42.123,
+      amount: 42.126, // Should round to 42.13
     };
 
-    const outcome = await Effect.runPromise(Effect.either(mapPlaidTransactionToDomain(txn)));
+    const result = await Effect.runPromise(mapPlaidTransactionToDomain(txn));
 
-    expect(outcome._tag).toBe("Left");
-    if (outcome._tag === "Left") {
-      expect(outcome.left).toMatchObject({
-        _tag: "TransactionInvalidAmount",
-        transactionId: "txn-123",
-      });
-    }
+    expect(result.amount.amount).toBe(42.13);
+    expect(result.amount.currency).toBe("USD");
+  });
+
+  it("rounds account balances to 2 decimal places", async () => {
+    const account = {
+      ...plaidAccountFixture,
+      balances: {
+        ...plaidAccountFixture.balances,
+        current: 100.127, // Should round to 100.13
+        available: 50.124, // Should round to 50.12
+      },
+    };
+
+    const result = await Effect.runPromise(mapPlaidAccountToDomain(account, context));
+
+    expect(result.currentBalance.amount).toBe(100.13);
+    expect(result.availableBalance?.amount).toBe(50.12);
   });
 });
