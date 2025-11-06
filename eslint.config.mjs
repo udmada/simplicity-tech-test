@@ -10,6 +10,7 @@ const tsProjects = [
   "./packages/finance-client/tsconfig.json",
   "./packages/finance-client/tsconfig.eslint.json",
   "./packages/finance-powertools/tsconfig.json",
+  "./packages/finance-powertools/tsconfig.eslint.json",
   "./packages/finance-powertools/tsconfig.cjs.json",
 ];
 
