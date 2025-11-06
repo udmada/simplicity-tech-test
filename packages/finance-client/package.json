@@ -15,25 +15,28 @@
   "license": "MIT",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     },
     "./effect": {
-      "types": "./dist/effect/index.d.ts",
-      "import": "./dist/effect/index.js",
-      "require": "./dist/effect/index.cjs"
+      "types": "./dist/esm/effect/index.d.ts",
+      "import": "./dist/esm/effect/index.js",
+      "require": "./dist/cjs/effect/index.js"
     }
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/esm/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "pnpm run clean && pnpm run build:esm && pnpm run build:cjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:types": "vitest run --typecheck.only",
@@ -48,7 +51,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
-    "tsup": "^8.3.5",
     "typescript": "^5.6.3",
     "vitest": "^2.1.5",
     "@vitest/ui": "^2.1.5"
