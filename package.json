@@ -3,30 +3,35 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "author": "udmada <git@adamdu.nz>",
   "description": "fintech-focused demo showcasing DDD, Event-based Design, FP, and CI/CD practices",
   "scripts": {
     "test:plaid": "tsx plaid-sandbox-test.ts",
     "build": "pnpm -r run build",
-    "dev": "pnpm --filter @udmada/finance-client dev",
     "test": "pnpm -r run test",
     "typecheck": "pnpm -r run typecheck",
     "lint": "pnpm exec eslint packages *.mjs",
     "format": "pnpm -r run format",
     "format:check": "pnpm -r run format:check"
   },
+  "packageManager": "pnpm@10.20.0",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@types/node": "^22.9.0",
-    "@typescript-eslint/eslint-plugin": "^8.9.0",
-    "@typescript-eslint/parser": "^8.9.0",
-    "dotenv": "^16.4.5",
+    "@types/node": "^24.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.3",
+    "@typescript-eslint/parser": "^8.46.3",
+    "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.5.4",
-    "plaid": "^27.0.0",
-    "prettier": "^3.3.3",
-    "tsx": "^4.19.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.25",
+      "estree-util-value-to-estree": "^3.3.3"
+    }
   }
 }
