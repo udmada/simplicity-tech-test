@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { AccountType } from "plaid";
 import { describe, expect, it } from "vitest";
 import { AccountId, InstitutionId, ItemId, TransactionId } from "~/domain/shared/ids";
 import {
@@ -70,6 +71,49 @@ describe("Plaid mappers", () => {
     }
   });
 
+  it("fails when account type is unsupported", async () => {
+    const account = {
+      ...plaidAccountFixture,
+      type: AccountType.Other,
+    };
+
+    const outcome = await Effect.runPromise(
+      Effect.either(mapPlaidAccountToDomain(account, context)),
+    );
+
+    expect(outcome._tag).toBe("Left");
+    if (outcome._tag === "Left") {
+      expect(outcome.left).toMatchObject({
+        _tag: "AccountUnsupportedType",
+        accountId: "acc-123",
+        type: AccountType.Other,
+      });
+    }
+  });
+
+  it("fails when account currency is unsupported", async () => {
+    const account = {
+      ...plaidAccountFixture,
+      balances: {
+        ...plaidAccountFixture.balances,
+        iso_currency_code: "JPY",
+      },
+    };
+
+    const outcome = await Effect.runPromise(
+      Effect.either(mapPlaidAccountToDomain(account, context)),
+    );
+
+    expect(outcome._tag).toBe("Left");
+    if (outcome._tag === "Left") {
+      expect(outcome.left).toMatchObject({
+        _tag: "AccountUnsupportedCurrency",
+        accountId: "acc-123",
+        currency: "JPY",
+      });
+    }
+  });
+
   it("maps Plaid transaction to domain type", async () => {
     const result = await Effect.runPromise(mapPlaidTransactionToDomain(plaidTransactionFixture));
 
@@ -95,6 +139,42 @@ describe("Plaid mappers", () => {
     if (outcome._tag === "Left") {
       expect(outcome.left).toMatchObject({
         _tag: "TransactionMissingCurrency",
+        transactionId: "txn-123",
+      });
+    }
+  });
+
+  it("fails when transaction currency unsupported", async () => {
+    const txn = {
+      ...plaidTransactionFixture,
+      iso_currency_code: "JPY",
+      unofficial_currency_code: null,
+    };
+
+    const outcome = await Effect.runPromise(Effect.either(mapPlaidTransactionToDomain(txn)));
+
+    expect(outcome._tag).toBe("Left");
+    if (outcome._tag === "Left") {
+      expect(outcome.left).toMatchObject({
+        _tag: "TransactionUnsupportedCurrency",
+        transactionId: "txn-123",
+        currency: "JPY",
+      });
+    }
+  });
+
+  it("fails when transaction amount violates money precision", async () => {
+    const txn = {
+      ...plaidTransactionFixture,
+      amount: 42.123,
+    };
+
+    const outcome = await Effect.runPromise(Effect.either(mapPlaidTransactionToDomain(txn)));
+
+    expect(outcome._tag).toBe("Left");
+    if (outcome._tag === "Left") {
+      expect(outcome.left).toMatchObject({
+        _tag: "TransactionInvalidAmount",
         transactionId: "txn-123",
       });
     }
