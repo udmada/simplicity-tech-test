@@ -1,0 +1,93 @@
+amends "package://pkg.pkl-lang.org/github.com/stefma/pkl-gha/com.github.action@0.0.5#/Workflow.pkl"
+
+import "package://pkg.pkl-lang.org/github.com/stefma/pkl-gha/com.github.action@0.0.5#/Context.pkl"
+
+name = "Deploy to Cloudflare"
+
+on {
+  push {
+    branches { "master" }
+    paths {
+      "apps/web/**"
+      "packages/**"
+    }
+  }
+  pull_request {
+    paths {
+      "apps/web/**"
+      "packages/**"
+    }
+  }
+}
+
+env {
+  ["CLOUDFLARE_API_TOKEN"] = Context.secrets("CLOUDFLARE_API_TOKEN")
+  ["CLOUDFLARE_ACCOUNT_ID"] = Context.secrets("CLOUDFLARE_ACCOUNT_ID")
+}
+
+jobs {
+  ["deploy"] {
+    `runs-on` = new UbuntuLatest {}
+    steps {
+      new {
+        name = "Checkout code"
+        uses = "actions/checkout@v4"
+      }
+      new {
+        name = "Install mise"
+        uses = "jdx/mise-action@v2"
+      }
+      new {
+        name = "Install dependencies"
+        run = "pnpm install --frozen-lockfile"
+      }
+      new {
+        name = "Build packages"
+        run = "pnpm build"
+      }
+      new {
+        name = "Build web app"
+        run = "pnpm --filter web build"
+      }
+      new {
+        name = "Deploy to Cloudflare Pages (Preview)"
+        `if` = "github.event_name == 'pull_request'"
+        run = """
+          cd apps/web
+          # Copy server bundle for _worker.js to import
+          cp -r build/server build/client/
+          # Deploy (includes _worker.js, server, and static assets)
+          wrangler pages deploy --commit-dirty=true --branch=${{ github.head_ref }}
+          """
+      }
+      new {
+        name = "Deploy to Cloudflare Pages (Production)"
+        `if` = "github.event_name == 'push' && github.ref == 'refs/heads/master'"
+        run = """
+          cd apps/web
+          # Copy server bundle for _worker.js to import
+          cp -r build/server build/client/
+          # Deploy (includes _worker.js, server, and static assets)
+          wrangler pages deploy --commit-dirty=true --branch=master
+          """
+      }
+      new {
+        name = "Comment PR with preview URL"
+        `if` = "github.event_name == 'pull_request'"
+        uses = "actions/github-script@v7"
+        with {
+          ["script"] = """
+            const branch = context.payload.pull_request.head.ref;
+            const url = `https://${branch}.simplicity-tech-test.pages.dev`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `### 🚀 Cloudflare Pages Preview\n\nDeployed to: ${url}`
+            });
+            """
+        }
+      }
+    }
+  }
+}

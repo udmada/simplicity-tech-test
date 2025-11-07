@@ -1,0 +1,17 @@
+# Do not modify!
+# This file was generated from a template using https://github.com/StefMa/pkl-gha
+
+name: Test Pkl Templates
+'on':
+  pull_request: {}
+  push: {}
+jobs:
+  test-pkl:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Install mise
+      uses: jdx/mise-action@v2
+    - name: Test pkl templates
+      run: pkl test .github/pkl-workflows/

@@ -1,0 +1,33 @@
+# Do not modify!
+# This file was generated from a template using https://github.com/StefMa/pkl-gha
+
+name: Publish to npm
+'on':
+  push:
+    tags:
+    - v*
+  workflow_dispatch: {}
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: publish-and-release
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Install mise
+      uses: jdx/mise-action@v2
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+    - name: Run tests
+      run: pnpm test
+    - name: Build packages
+      run: pnpm build
+    - name: Setup .npmrc
+      run: |-
+        cat << EOF > .npmrc
+        //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+        registry=https://registry.npmjs.org/
+        always-auth=true
+        EOF
+    - name: Publish packages
+      run: pnpm publish -r --access public --no-git-checks

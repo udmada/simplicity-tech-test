@@ -1,0 +1,55 @@
+amends "package://pkg.pkl-lang.org/github.com/stefma/pkl-gha/com.github.action@0.0.5#/Workflow.pkl"
+
+import "package://pkg.pkl-lang.org/github.com/stefma/pkl-gha/com.github.action@0.0.5#/Context.pkl"
+
+name = "Publish to npm"
+
+on {
+  workflow_dispatch {}
+  push {
+    tags { "v*" }
+  }
+}
+
+jobs {
+  ["publish"] {
+    environment = "publish-and-release"
+    `runs-on` = new UbuntuLatest {}
+    steps {
+      new {
+        name = "Checkout code"
+        uses = "actions/checkout@v4"
+      }
+      new {
+        name = "Install mise"
+        uses = "jdx/mise-action@v2"
+      }
+      new {
+        name = "Install dependencies"
+        run = "pnpm install --frozen-lockfile"
+      }
+      new {
+        name = "Run tests"
+        run = "pnpm test"
+      }
+      new {
+        name = "Build packages"
+        run = "pnpm build"
+      }
+      new {
+        name = "Setup .npmrc"
+        run = """
+          cat << EOF > .npmrc
+          //registry.npmjs.org/:_authToken=\(Context.secrets("NPM_TOKEN"))
+          registry=https://registry.npmjs.org/
+          always-auth=true
+          EOF
+          """
+      }
+      new {
+        name = "Publish packages"
+        run = "pnpm publish -r --access public --no-git-checks"
+      }
+    }
+  }
+}

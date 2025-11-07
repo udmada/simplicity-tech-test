@@ -1,0 +1,48 @@
+amends "package://pkg.pkl-lang.org/github.com/stefma/pkl-gha/com.github.action@0.0.5#/Workflow.pkl"
+
+name = "CI"
+
+on {
+  push {
+    branches { "master" }
+  }
+  pull_request {
+    branches { "master" }
+  }
+}
+
+jobs {
+  ["ci"] {
+    `runs-on` = new UbuntuLatest {}
+    steps {
+      new {
+        name = "Checkout code"
+        uses = "actions/checkout@v4"
+      }
+      new {
+        name = "Install mise"
+        uses = "jdx/mise-action@v2"
+      }
+      new {
+        name = "Install dependencies"
+        run = "pnpm install --frozen-lockfile"
+      }
+      new {
+        name = "Lint"
+        run = "pnpm lint"
+      }
+      new {
+        name = "Type check"
+        run = "pnpm typecheck"
+      }
+      new {
+        name = "Run tests"
+        run = "pnpm test"
+      }
+      new {
+        name = "Build packages"
+        run = "pnpm build"
+      }
+    }
+  }
+}

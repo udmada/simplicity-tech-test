@@ -1,0 +1,92 @@
+amends "package://pkg.pkl-lang.org/github.com/stefma/pkl-gha/com.github.action@0.0.5#/Workflow.pkl"
+
+name = "Version & Tag"
+
+on {
+  workflow_dispatch {
+    inputs {
+      ["version"] {
+        description = "Version bump type"
+        required = true
+        `type` = "choice"
+        options {
+          "patch"
+          "minor"
+          "major"
+        }
+        `default` = "patch"
+      }
+    }
+  }
+}
+
+jobs {
+  ["version"] {
+    environment = "publish-and-release"
+    `runs-on` = new UbuntuLatest {}
+    steps {
+      new {
+        name = "Checkout code"
+        uses = "actions/checkout@v4"
+        with {
+          ["fetch-depth"] = "0"
+          ["token"] = "${{ secrets.GITHUB_TOKEN }}"
+        }
+      }
+      new {
+        name = "Install mise"
+        uses = "jdx/mise-action@v2"
+      }
+      new {
+        name = "Install dependencies"
+        run = "pnpm install --frozen-lockfile"
+      }
+      new {
+        name = "Configure git"
+        run = """
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          """
+      }
+      new {
+        name = "Bump version"
+        run = "pnpm -r version ${{ github.event.inputs.version }}"
+      }
+      new {
+        name = "Get new version"
+        id = "version"
+        run = """
+          NEW_VERSION=$(node -p "require('./packages/finance-client/package.json').version")
+          echo "new_version=v$NEW_VERSION" >> $GITHUB_OUTPUT
+          """
+      }
+      new {
+        name = "Commit version bump"
+        run = """
+          git add package.json pnpm-lock.yaml packages/*/package.json
+          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
+          """
+      }
+      new {
+        name = "Ensure clean working tree"
+        run = """
+          if [ -n "$(git status --short)" ]; then
+            echo "Working tree is not clean:"
+            git status --short
+            exit 1
+          fi
+          """
+      }
+      new {
+        name = "Tag and push"
+        run = """
+          git tag ${{ steps.version.outputs.new_version }}
+          git tag -f latest
+          git push origin master
+          git push origin ${{ steps.version.outputs.new_version }}
+          git push origin latest --force
+          """
+      }
+    }
+  }
+}
