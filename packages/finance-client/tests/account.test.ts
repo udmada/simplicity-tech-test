@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach, vi, afterEach } from "vitest";
 import { Effect } from "effect";
 
-import { withdraw, deposit, freeze, unfreeze, Account } from "~/domain/banking/account";
+import { withdraw, deposit, freeze, unfreeze, type Account } from "~/domain/banking/account";
 import { makeMoney } from "~/domain/shared/money";
 import { AccountId, ItemId, InstitutionId } from "~/domain/shared/ids";
 
