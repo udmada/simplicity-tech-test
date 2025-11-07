@@ -37,15 +37,13 @@ jobs {
           """
       }
       new {
-        name = "Verify all pkl workflows are converted"
+        name = "Verify if pkl actions are converted"
         run = """
           if ! git diff --exit-code .github/workflows/; then
             echo "❌ Error: Pkl workflows are not converted to YAML!"
             echo ""
-            echo "Please run the following command and commit the changes:"
-            echo '  pkl eval .github/pkl-workflows/*.pkl -o ".github/workflows/%{moduleName}.yml"'
-            echo ""
-            echo "This will convert all .pkl files to their corresponding .yml files."
+            echo "Run:"
+            echo "  pkl eval .github/pkl-workflows/*.pkl -o .github/workflows/%{moduleName}.yml"
             exit 1
           fi
           echo "✅ All pkl workflows are properly converted to YAML"
