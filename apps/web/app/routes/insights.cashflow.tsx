@@ -1,40 +1,11 @@
-import { json, type LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { useFetcher } from "react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useFetcher, useLoaderData } from "@remix-run/react";
 import { Effect } from "effect";
 import { PlaidClient, mapPlaidTransactionToDomain } from "@udmada/finance-client";
 import type { PlaidTransactionDomain } from "@udmada/finance-client";
+import type { Route } from "./+types/insights.cashflow";
 import { createRuntimeLayer, getPlaidConfig } from "~/lib/runtime.server";
 
-interface Env {
-  PLAID_CLIENT_ID?: string;
-  PLAID_SECRET?: string;
-  PLAID_ENV?: string;
-  SANDBOX_ACCESS_TOKEN?: string;
-}
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-const isCloudflareEnvContext = (
-  value: unknown,
-): value is { cloudflare: { env?: Partial<Env> } } => {
-  if (!isRecord(value) || !("cloudflare" in value)) {
-    return false;
-  }
-
-  const cloudflare = value.cloudflare;
-  if (!isRecord(cloudflare)) {
-    return false;
-  }
-
-  if (!("env" in cloudflare)) {
-    return false;
-  }
-
-  const envValue = cloudflare.env;
-  return envValue === undefined || isRecord(envValue);
-};
 interface CashflowWindow {
   readonly months: number;
   readonly startDate: string;
@@ -124,12 +95,11 @@ const aggregateCashflow = (
     const amount = transaction.amount.amount;
     const monthKey = transaction.date.slice(0, 7); // YYYY-MM
 
-    const snapshot =
-      monthly.get(monthKey) ?? {
-        inflow: 0,
-        outflow: 0,
-        net: 0,
-      };
+    const snapshot = monthly.get(monthKey) ?? {
+      inflow: 0,
+      outflow: 0,
+      net: 0,
+    };
 
     if (amount < 0) {
       const inflow = Math.abs(amount);
@@ -138,7 +108,8 @@ const aggregateCashflow = (
     } else {
       snapshot.outflow += amount;
       totalOutflow += amount;
-      const categoryNames = transaction.category.length > 0 ? transaction.category : ["Uncategorized"];
+      const categoryNames =
+        transaction.category.length > 0 ? transaction.category : ["Uncategorized"];
       for (const name of categoryNames) {
         const category = categories.get(name) ?? { total: 0, count: 0 };
         category.total += amount;
@@ -203,34 +174,22 @@ const aggregateCashflow = (
   };
 };
 
-export async function loader({ request, context }: LoaderFunctionArgs) {
+export async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const windowParam = url.searchParams.get("window");
   const requestedWindow = windowParam ? Number.parseInt(windowParam, 10) : null;
   const months = clampWindow(Number.isNaN(requestedWindow) ? null : requestedWindow);
 
-  const envSource: Partial<Env> =
-    isCloudflareEnvContext(context) && context.cloudflare.env ? context.cloudflare.env : {};
-
-  const env: Env = {
-    PLAID_CLIENT_ID:
-      typeof envSource.PLAID_CLIENT_ID === "string" ? envSource.PLAID_CLIENT_ID : undefined,
-    PLAID_SECRET:
-      typeof envSource.PLAID_SECRET === "string" ? envSource.PLAID_SECRET : undefined,
-    PLAID_ENV: typeof envSource.PLAID_ENV === "string" ? envSource.PLAID_ENV : undefined,
-    SANDBOX_ACCESS_TOKEN:
-      typeof envSource.SANDBOX_ACCESS_TOKEN === "string"
-        ? envSource.SANDBOX_ACCESS_TOKEN
-        : undefined,
-  };
+  const env = context.cloudflare?.env ?? {};
   const accessToken = env.SANDBOX_ACCESS_TOKEN;
 
   if (!accessToken) {
     // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw json(
-      { code: "PLAID_TOKEN_MISSING" },
-      { status: 401, statusText: "Plaid sandbox token missing" },
-    );
+    throw new Response(JSON.stringify({ code: "PLAID_TOKEN_MISSING" }), {
+      status: 401,
+      statusText: "Plaid sandbox token missing",
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const { startDate, endDate } = calculateDateRange(months);
@@ -278,8 +237,8 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   return result satisfies CashflowLoaderData;
 }
 
-export default function CashflowInsights() {
-  const initialData = useLoaderData<typeof loader>();
+export default function CashflowInsights({ loaderData }: Route.ComponentProps) {
+  const initialData = loaderData;
   const fetcher = useFetcher<typeof loader>();
   const [selectedWindow, setSelectedWindow] = useState(initialData.window.months);
   const [viewData, setViewData] = useState(initialData);
@@ -300,7 +259,7 @@ export default function CashflowInsights() {
 
   const handleWindowChange = (months: number) => {
     setSelectedWindow(months);
-    fetcher.load(`/insights/cashflow?window=${months}`);
+    void fetcher.load(`/insights/cashflow?window=${months}`);
   };
 
   const trend = useMemo(() => {
@@ -312,8 +271,7 @@ export default function CashflowInsights() {
       viewData.monthly[viewData.monthly.length - 1],
     ];
     const delta = latest.net - previous.net;
-    const direction: "steady" | "up" | "down" =
-      delta === 0 ? "steady" : delta > 0 ? "up" : "down";
+    const direction: "steady" | "up" | "down" = delta === 0 ? "steady" : delta > 0 ? "up" : "down";
     return {
       delta,
       direction,
@@ -328,8 +286,8 @@ export default function CashflowInsights() {
             <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">Insights</p>
             <h1 className="text-3xl font-bold text-gray-900">Cashflow Pulse</h1>
             <p className="mt-2 max-w-2xl text-sm text-gray-600">
-              Track inflows, outflows, and category-level spending to prep KiwiSaver conversations and
-              coach members toward better savings habits.
+              Track inflows, outflows, and category-level spending to prep KiwiSaver conversations
+              and coach members toward better savings habits.
             </p>
           </div>
           <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-100 p-1">
@@ -476,7 +434,7 @@ function MetricCard({
   } as const;
 
   return (
-    <div className={`rounded-xl border bg-gradient-to-br p-6 shadow-sm ${variants[variant]}`}>
+    <div className={`rounded-xl border bg-linear-to-br p-6 shadow-sm ${variants[variant]}`}>
       <p className="text-xs uppercase tracking-wide text-gray-600">{title}</p>
       <p className="mt-3 text-2xl font-semibold text-gray-900">
         {loading ? "…" : formatCurrency(value, currency)}
@@ -491,11 +449,7 @@ function MetricCard({
                 : "text-gray-600"
           }`}
         >
-          {trend.direction === "up"
-            ? "▲"
-            : trend.direction === "down"
-              ? "▼"
-              : "■"}{" "}
+          {trend.direction === "up" ? "▲" : trend.direction === "down" ? "▼" : "■"}{" "}
           {formatCurrency(Math.abs(trend.delta), currency)} vs prev. month
         </p>
       )}

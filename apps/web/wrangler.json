@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "simplicity-tech-test",
+  "main": "./workers/app.ts",
+  "compatibility_date": "2025-10-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  "upload_source_maps": true,
+  "vars": {
+    "PLAID_ENV": "",
+    "PLAID_CLIENT_ID": "",
+    "PLAID_SECRET": "",
+    "SANDBOX_ACCESS_TOKEN": ""
+  }
+}

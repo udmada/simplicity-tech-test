@@ -1,4 +1,3 @@
-import type { LinksFunction } from "@remix-run/cloudflare";
 import {
   Links,
   Meta,
@@ -8,13 +7,12 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   useLocation,
-  useRouteError,
-} from "@remix-run/react";
+} from "react-router";
 import { useState } from "react";
+import stylesheet from "./app.css?url";
+import type { Route } from "./+types/root";
 
-import stylesheet from "~/tailwind.css?url";
-
-export const links: LinksFunction = () => [
+export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
   { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
 ];
@@ -82,7 +80,6 @@ const navigation = [
 
 export default function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
   const sidebarWidthClass = isSidebarCollapsed ? "lg:w-24" : "lg:w-72";
   const mainPaddingClass = isSidebarCollapsed ? "lg:pl-24" : "lg:pl-72";
 
@@ -108,7 +105,6 @@ export default function App() {
           <nav className="flex-1 space-y-1 px-2 py-6 lg:px-4">
             {navigation.map((item) => (
               <NavLink
-                prefetch="intent"
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) => {
@@ -179,7 +175,6 @@ export default function App() {
             <div className="mt-4 flex gap-2">
               {navigation.map((item) => (
                 <NavLink
-                  prefetch="intent"
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
@@ -205,8 +200,7 @@ export default function App() {
   );
 }
 
-export function ErrorBoundary() {
-  const error = useRouteError();
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   const location = useLocation();
 
   if (
@@ -223,16 +217,10 @@ export function ErrorBoundary() {
           <div className="mb-6 space-y-2">
             <h1 className="text-2xl font-bold text-gray-900">Plaid sandbox token required</h1>
             <p className="text-sm text-gray-600">
-              Provide the Plaid sandbox access token so the demo can hydrate account and cashflow
-              data. The token will be stored in a browser cookie for this session only.
+              Set <code>SANDBOX_ACCESS_TOKEN</code> in your Cloudflare environment (or{" "}
+              <code>.dev.vars</code>) and redeploy to hydrate demo data.
             </p>
           </div>
-
-          <p className="text-sm text-gray-600">
-            SANDBOX_ACCESS_TOKEN is not configured. Update your Cloudflare Pages/Workers env or local
-            <code className="ml-1 rounded bg-gray-100 px-1 py-0.5">.dev.vars</code> and restart the dev
-            server.
-          </p>
           <a
             href={location.pathname}
             className="mt-6 inline-flex w-full items-center justify-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
@@ -244,48 +232,26 @@ export function ErrorBoundary() {
     );
   }
 
+  let message = "Oops!";
+  let details = "An unexpected error occurred.";
+  let stack: string | undefined;
+
+  if (isRouteErrorResponse(error)) {
+    message = `${error.status}`;
+    details = error.statusText || details;
+  } else if (import.meta.env.DEV && error instanceof Error) {
+    details = error.message;
+    stack = error.stack;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
-          <svg
-            className="w-6 h-6 text-red-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
-          </svg>
-        </div>
-
-        <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
-          Oops! Something went wrong
-        </h1>
-
-        <p className="text-gray-600 text-center mb-6">
-          {isRouteErrorResponse(error)
-            ? `${error.status} ${error.statusText}`
-            : error instanceof Error
-              ? error.message
-              : "Unknown error occurred"}
-        </p>
-
-        {error instanceof Error && error.stack && (
-          <details className="mt-4">
-            <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-              Show error details
-            </summary>
-            <pre className="mt-2 p-4 bg-gray-50 rounded text-xs overflow-auto max-h-64">
-              {error.stack}
-            </pre>
-          </details>
+        <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">{message}</h1>
+        <p className="text-gray-600 text-center mb-6">{details}</p>
+        {stack && (
+          <pre className="mt-4 p-4 bg-gray-50 rounded text-xs overflow-auto max-h-64">{stack}</pre>
         )}
-
         <div className="mt-6">
           <a
             href="/"

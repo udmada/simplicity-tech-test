@@ -12,9 +12,14 @@ import {
 export const createRuntimeLayer = (plaidConfig: PlaidConfig) => {
   const plaidLayer = PlaidClientLayer(plaidConfig);
 
+  const nodeEnv =
+    typeof globalThis !== "undefined" && "process" in globalThis
+      ? (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+          ?.NODE_ENV
+      : undefined;
+
   const isProd =
-    process.env.NODE_ENV === "production" ||
-    plaidConfig.environment === "production";
+    nodeEnv === "production" || plaidConfig.environment === "production";
 
   const observabilityLayer = isProd
     ? productionPowertoolsLayer({

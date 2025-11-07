@@ -1,5 +1,4 @@
-import { json, type LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import type { Route } from "./+types/accounts";
 import { Effect } from "effect";
 import {
   PlaidClient,
@@ -10,64 +9,18 @@ import {
 } from "@udmada/finance-client";
 import { createRuntimeLayer, getPlaidConfig } from "~/lib/runtime.server";
 
-interface Env {
-  PLAID_CLIENT_ID?: string;
-  PLAID_SECRET?: string;
-  PLAID_ENV?: string;
-  SANDBOX_ACCESS_TOKEN?: string;
-}
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-const isCloudflareEnvContext = (
-  value: unknown,
-): value is { cloudflare: { env?: Partial<Env> } } => {
-  if (!isRecord(value) || !("cloudflare" in value)) {
-    return false;
-  }
-
-  const cloudflare = value.cloudflare;
-  if (!isRecord(cloudflare)) {
-    return false;
-  }
-
-  if (!("env" in cloudflare)) {
-    return false;
-  }
-
-  const envValue = cloudflare.env;
-  return envValue === undefined || isRecord(envValue);
-};
-
-export async function loader({ context }: LoaderFunctionArgs) {
-  const envSource: Partial<Env> =
-    isCloudflareEnvContext(context) && context.cloudflare.env ? context.cloudflare.env : {};
-
-  const env: Env = {
-    PLAID_CLIENT_ID:
-      typeof envSource.PLAID_CLIENT_ID === "string" ? envSource.PLAID_CLIENT_ID : undefined,
-    PLAID_SECRET: typeof envSource.PLAID_SECRET === "string" ? envSource.PLAID_SECRET : undefined,
-    PLAID_ENV: typeof envSource.PLAID_ENV === "string" ? envSource.PLAID_ENV : undefined,
-    SANDBOX_ACCESS_TOKEN:
-      typeof envSource.SANDBOX_ACCESS_TOKEN === "string"
-        ? envSource.SANDBOX_ACCESS_TOKEN
-        : undefined,
-  };
-
+export async function loader({ context }: Route.LoaderArgs) {
+  const env = context.cloudflare?.env ?? {};
   const accessToken = env.SANDBOX_ACCESS_TOKEN;
-  if (!accessToken) {
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw json(
-      { code: "PLAID_TOKEN_MISSING" },
-      {
-        status: 401,
-        statusText: "Plaid sandbox token missing",
-      },
-    );
-  }
+ if (!accessToken) {
+		// eslint-disable-next-line @typescript-eslint/only-throw-error
+		throw new Response(JSON.stringify({ code: "PLAID_TOKEN_MISSING" }), {
+			status: 401,
+			statusText: "Plaid sandbox token missing",
+			headers: { "Content-Type": "application/json" },
+		});
+	}
 
-  // Create runtime layer
   const plaidConfig = getPlaidConfig(env);
   const runtimeLayer = createRuntimeLayer(plaidConfig);
 
@@ -94,14 +47,13 @@ export async function loader({ context }: LoaderFunctionArgs) {
     Effect.map(({ accounts }) => accounts),
   );
 
-  // Run Effect and return data
   const accounts = await Effect.runPromise(program.pipe(Effect.provide(runtimeLayer)));
 
   return { accounts };
 }
 
-export default function Accounts() {
-  const { accounts } = useLoaderData<typeof loader>();
+export default function Accounts({ loaderData }: Route.ComponentProps) {
+  const { accounts } = loaderData;
 
   return (
     <div className="space-y-8">
@@ -154,7 +106,7 @@ export default function Accounts() {
             </svg>
             <h3 className="mt-2 text-sm font-medium text-gray-900">No accounts</h3>
             <p className="mt-1 text-sm text-gray-500">
-              Get started by connecting your first account.
+              Connect a sandbox item to see balances and metadata.
             </p>
           </div>
         ) : (

@@ -1,6 +1,6 @@
 # @udmada/web
 
-Remix + Tailwind app used to demo the finance monorepo. It shells accounts and cashflow routes around a Plaid sandbox backend and the powertools observability layer.
+React Router + Cloudflare Workers shell that powers the Simplicity finance demo. It renders the Plaid-driven accounts dashboard and cashflow insights using the shared finance-client and powertools packages.
 
 ## Setup
 
@@ -9,7 +9,7 @@ pnpm install
 pnpm --filter @udmada/web dev
 ```
 
-Provide Plaid credentials via `.dev.vars` or exported env vars:
+Provide Plaid credentials via `.dev.vars` or `wrangler secret put`:
 
 ```
 PLAID_CLIENT_ID=...
@@ -18,28 +18,36 @@ SANDBOX_ACCESS_TOKEN=...
 PLAID_ENV=sandbox
 ```
 
-The dev server runs at <http://localhost:5173>.
+## Key files
 
-## What lives here?
+| Path | Purpose |
+| --- | --- |
+| `app/root.tsx` | Sidebar layout + error boundary. |
+| `app/lib/runtime.server.ts` | Effect layer that wires Plaid + powertools. |
+| `app/routes/accounts.tsx` | Lists accounts with balances & metadata. |
+| `app/routes/insights.cashflow.tsx` | Aggregates transactions into cashflow metrics. |
+| `workers/app.ts` | Cloudflare Worker entry (passes env/context into loaders). |
 
-| Path                               | Why it matters                                              |
-| ---------------------------------- | ----------------------------------------------------------- |
-| `app/root.tsx`                     | Layout/shell, sidebar, error boundary.                      |
-| `app/lib/runtime.server.ts`        | Builds the Effect layer that combines Plaid and powertools. |
-| `app/routes/accounts.tsx`          | Fetch accounts, map to domain models, render cards.         |
-| `app/routes/insights.cashflow.tsx` | Aggregate transactions into cashflow insights.              |
-
-## Architecture (quick view)
+## Architecture
 
 ```mermaid
 flowchart LR
-  Browser --> Remix[Remix Routes]
-  Remix --> RuntimeLayer
+  Routes --> RuntimeLayer
   RuntimeLayer --> Powertools[@udmada/finance-powertools]
-  RuntimeLayer --> PlaidClient[@udmada/finance-client]
-  PlaidClient --> PlaidAPI[(Plaid API)]
+  RuntimeLayer --> FinanceClient[@udmada/finance-client]
+  FinanceClient --> Plaid[(Plaid API)]
+  Powertools --> Observability[(console | OTEL)]
+  RuntimeLayer -->|Effect| ReactUI[[React Router routes]]
 ```
 
-Every loader calls `createRuntimeLayer` before running its Effect program, so telemetry (console vs OTEL) and Plaid creds are wired once.
+Each loader creates the runtime layer once per request so observability + Plaid credentials stay centralized.
 
-Cloudflare Pages is configured in `wrangler.toml`; preview mirrors the production runtime.
+## Scripts
+
+```bash
+pnpm --filter @udmada/web dev      # HMR
+pnpm --filter @udmada/web build    # react-router build
+pnpm --filter @udmada/web preview  # vite preview
+```
+
+Deploy with `wrangler deploy` after building.
