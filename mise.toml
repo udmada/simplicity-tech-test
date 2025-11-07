@@ -2,3 +2,4 @@
 node = "lts"
 pkl = "latest"
 pnpm = "latest"
+wrangler = "latest"
