@@ -30,34 +30,13 @@ jobs:
       run: pnpm build
     - name: Build web app
       run: pnpm --filter web build
-    - name: Deploy to Cloudflare Pages (Preview)
+    - name: Deploy Cloudflare Worker (Preview)
       if: github.event_name == 'pull_request'
       run: |-
         cd apps/web
-        # Copy server bundle for _worker.js to import
-        cp -r build/server build/client/
-        # Deploy (includes _worker.js, server, and static assets)
-        wrangler pages deploy --commit-dirty=true --branch=${{ github.head_ref }}
-    - name: Deploy to Cloudflare Pages (Production)
+        wrangler deploy --preview --commit-dirty=true
+    - name: Deploy Cloudflare Worker (Production)
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: |-
         cd apps/web
-        # Copy server bundle for _worker.js to import
-        cp -r build/server build/client/
-        # Deploy (includes _worker.js, server, and static assets)
-        wrangler pages deploy --commit-dirty=true --branch=master
-    - name: Comment PR with preview URL
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |-
-          const branch = context.payload.pull_request.head.ref;
-          const url = `https://${branch}.simplicity-tech-test.pages.dev`;
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `### 🚀 Cloudflare Pages Preview
-
-          Deployed to: ${url}`
-          });
+        wrangler deploy --commit-dirty=true
