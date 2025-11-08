@@ -37,7 +37,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 const navigation = [
   {
-    to: "/accounts",
+    to: "/",
     label: "Accounts",
     description: "Connected institutions & balances",
     icon: (
