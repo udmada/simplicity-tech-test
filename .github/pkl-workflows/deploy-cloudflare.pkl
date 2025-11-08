@@ -50,19 +50,19 @@ jobs {
         run = "pnpm --filter web build"
       }
       new {
-        name = "Deploy Cloudflare Worker (Preview)"
-        `if` = "github.event_name == 'pull_request'"
-        run = """
-          cd apps/web
-          wrangler deploy --preview --commit-dirty=true
-          """
-      }
-      new {
-        name = "Deploy Cloudflare Worker (Production)"
+        name = "Deploy Cloudflare Worker (Dry Run)"
         `if` = "github.event_name == 'push' && github.ref == 'refs/heads/master'"
         run = """
           cd apps/web
-          wrangler deploy --commit-dirty=true
+          wrangler deploy --dry-run
+          """
+      }
+      new {
+        name = "Deploy Cloudflare Worker"
+        `if` = "github.event_name == 'push' && github.ref == 'refs/heads/master'"
+        run = """
+          cd apps/web
+          wrangler deploy
           """
       }
     }
