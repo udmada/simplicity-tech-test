@@ -11,7 +11,11 @@
     "rootDir": "./",
     "baseUrl": ".",
     "paths": {
-      "~/*": ["packages/finance-client/src/*"]
+      "~/*": ["packages/finance-client/src/*"],
+      "@udmada/finance-client": ["packages/finance-client/src/index.ts"],
+      "@udmada/finance-client/*": ["packages/finance-client/src/*"],
+      "@udmada/finance-powertools": ["packages/finance-powertools/src/index.ts"],
+      "@udmada/finance-powertools/*": ["packages/finance-powertools/src/*"]
     },
     "strict": true,
     "noUnusedLocals": true,

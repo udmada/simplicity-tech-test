@@ -13,7 +13,8 @@ const tsProjects = [
   "./packages/finance-powertools/tsconfig.eslint.json",
   "./packages/finance-powertools/tsconfig.cjs.json",
   "./apps/web/tsconfig.json",
-  "./apps/web/tsconfig.eslint.json",
+  "./apps/web/tsconfig.cloudflare.json",
+  "./apps/web/tsconfig.node.json",
 ];
 
 export default tseslint.config(

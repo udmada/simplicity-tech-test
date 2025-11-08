@@ -1,33 +1,30 @@
 import { createRequestHandler } from "react-router";
 
+type FinanceEnv = {
+  PLAID_CLIENT_ID: string;
+  PLAID_SECRET: string;
+  PLAID_ENV: "sandbox" | "development" | "production";
+  SANDBOX_ACCESS_TOKEN: string;
+};
+
 declare module "react-router" {
   export interface AppLoadContext {
     cloudflare: {
-      env: Env;
+      env: FinanceEnv;
       ctx: ExecutionContext;
     };
   }
 }
 
-const serverBuild = () =>
-  // @ts-ignore - generated at build time
-  import("../build/server/index.js");
-
-const runtimeMode =
-  (import.meta as { env?: { MODE?: string } }).env?.MODE ??
-  (
-    globalThis as typeof globalThis & {
-      process?: { env?: { NODE_ENV?: string } };
-    }
-  ).process?.env?.NODE_ENV ??
-  "production";
-
-const requestHandler = createRequestHandler(serverBuild, runtimeMode);
+const requestHandler = createRequestHandler(
+  () => import("virtual:react-router/server-build"),
+  import.meta.env.MODE,
+);
 
 export default {
-  fetch(request, env, ctx) {
+  async fetch(request: Request, env: FinanceEnv, ctx: ExecutionContext) {
     return requestHandler(request, {
       cloudflare: { env, ctx },
     });
   },
-} satisfies ExportedHandler<Env>;
+} satisfies ExportedHandler<FinanceEnv>;

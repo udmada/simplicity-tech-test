@@ -6,14 +6,11 @@
     "app/**/.server/**/*",
     "app/**/.client/**/*",
     "workers/**/*",
-    "worker-configuration.d.ts",
-    "types.d.ts"
+    "worker-configuration.d.ts"
   ],
-  "exclude": ["build"],
   "compilerOptions": {
     "composite": true,
     "strict": true,
-    "checkJs": false,
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["@cloudflare/workers-types", "vite/client"],
     "target": "ES2022",

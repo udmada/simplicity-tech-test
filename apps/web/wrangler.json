@@ -9,9 +9,6 @@
   },
   "upload_source_maps": true,
   "vars": {
-    "PLAID_ENV": "",
-    "PLAID_CLIENT_ID": "",
-    "PLAID_SECRET": "",
-    "SANDBOX_ACCESS_TOKEN": ""
+    "PLAID_ENV": "sandbox"
   }
 }

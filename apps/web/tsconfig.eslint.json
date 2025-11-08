@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig.cloudflare.json",
-  "include": ["app/**/*", "workers/**/*", "types.d.ts", "worker-configuration.d.ts"],
-  "exclude": ["build", "node_modules"]
-}

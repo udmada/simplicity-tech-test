@@ -10,16 +10,19 @@ import {
 import { createRuntimeLayer, getPlaidConfig } from "~/lib/runtime.server";
 
 export async function loader({ context }: Route.LoaderArgs) {
-  const env = context.cloudflare?.env ?? {};
-  const accessToken = env.SANDBOX_ACCESS_TOKEN;
- if (!accessToken) {
-		// eslint-disable-next-line @typescript-eslint/only-throw-error
-		throw new Response(JSON.stringify({ code: "PLAID_TOKEN_MISSING" }), {
-			status: 401,
-			statusText: "Plaid sandbox token missing",
-			headers: { "Content-Type": "application/json" },
-		});
-	}
+  if (!context.cloudflare) {
+    throw new Error("Cloudflare context missing");
+  }
+  const env = context.cloudflare.env;
+  const accessToken = env?.SANDBOX_ACCESS_TOKEN;
+  if (!accessToken) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
+    throw new Response(JSON.stringify({ code: "PLAID_TOKEN_MISSING" }), {
+      status: 401,
+      statusText: "Plaid sandbox token missing",
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   const plaidConfig = getPlaidConfig(env);
   const runtimeLayer = createRuntimeLayer(plaidConfig);
