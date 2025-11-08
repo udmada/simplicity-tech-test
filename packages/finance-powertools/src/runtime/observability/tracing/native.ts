@@ -1,9 +1,16 @@
-import { randomBytes } from "node:crypto";
-
 import { Context, Layer, Option, Tracer } from "effect";
 import type { Span, SpanKind, SpanLink } from "effect/Tracer";
 
-const randomHex = (bytes: number) => randomBytes(bytes).toString("hex");
+const bufferToHex = (buffer: Iterable<number>) =>
+  [...buffer]
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("");
+
+const randomHex = (bytes: number) => {
+  const buffer = new Uint8Array(bytes);
+  crypto.getRandomValues(buffer);
+  return bufferToHex(buffer);
+};
 
 const randomTraceId = () => randomHex(16);
 const randomSpanId = () => randomHex(8);

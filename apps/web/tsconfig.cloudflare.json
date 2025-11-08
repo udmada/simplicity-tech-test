@@ -6,7 +6,9 @@
     "app/**/.server/**/*",
     "app/**/.client/**/*",
     "workers/**/*",
-    "worker-configuration.d.ts"
+    "worker-configuration.d.ts",
+    "../../packages/finance-client/src/**/*",
+    "../../packages/finance-powertools/src/**/*"
   ],
   "compilerOptions": {
     "composite": true,
@@ -20,7 +22,11 @@
     "baseUrl": ".",
     "rootDirs": [".", "./.react-router/types"],
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      "@udmada/finance-client": ["../../packages/finance-client/src/index.ts"],
+      "@udmada/finance-client/*": ["../../packages/finance-client/src/*"],
+      "@udmada/finance-powertools": ["../../packages/finance-powertools/src/index.ts"],
+      "@udmada/finance-powertools/*": ["../../packages/finance-powertools/src/*"]
     },
     "esModuleInterop": true,
     "resolveJsonModule": true
