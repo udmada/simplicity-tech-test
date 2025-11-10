@@ -61,6 +61,10 @@ jobs {
           """
       }
       new {
+        name = "Clean install artifacts"
+        run =  "git clean -fdX"
+      }
+      new {
         name = "Commit version bump"
         run = """
           git add package.json pnpm-lock.yaml packages/*/package.json

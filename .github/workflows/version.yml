@@ -39,6 +39,8 @@ jobs:
       run: |-
         NEW_VERSION=$(node -p "require('./packages/finance-client/package.json').version")
         echo "new_version=v$NEW_VERSION" >> $GITHUB_OUTPUT
+    - name: Clean install artifacts
+      run: git clean -fdX
     - name: Commit version bump
       run: |-
         git add package.json pnpm-lock.yaml packages/*/package.json
