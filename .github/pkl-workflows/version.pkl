@@ -50,7 +50,7 @@ jobs {
       }
       new {
         name = "Bump version"
-        run = "pnpm -r version ${{ github.event.inputs.version }}"
+        run = "pnpm -rc npm version ${{ github.event.inputs.version }}"
       }
       new {
         name = "Get new version"

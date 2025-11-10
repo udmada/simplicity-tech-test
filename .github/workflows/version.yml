@@ -33,7 +33,7 @@ jobs:
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
     - name: Bump version
-      run: pnpm -r version ${{ github.event.inputs.version }}
+      run: pnpm -rc npm version ${{ github.event.inputs.version }}
     - name: Get new version
       id: version
       run: |-

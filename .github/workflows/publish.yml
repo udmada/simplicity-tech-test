@@ -30,4 +30,4 @@ jobs:
         always-auth=true
         EOF
     - name: Publish packages
-      run: pnpm publish -r --access public --no-git-checks
+      run: pnpm -r publish --access public --no-git-checks
