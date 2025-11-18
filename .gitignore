@@ -1,3 +1,6 @@
 .npmrc
 .idea/
 .vscode/
+.pnpm-store/
+node_modules/
+**/node_modules/
