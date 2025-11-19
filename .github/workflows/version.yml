@@ -30,10 +30,6 @@ jobs:
       uses: jdx/mise-action@v2
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
-    - name: Configure git
-      run: |-
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
     - name: Bump version
       run: pnpm -rc npm version --no-git-tag-version ${{ github.event.inputs.version }}
     - name: Get new version
@@ -43,21 +39,17 @@ jobs:
         echo "new_version=v$NEW_VERSION" >> $GITHUB_OUTPUT
     - name: Clean install artifacts
       run: git clean -fdX
-    - name: Commit version bump
+    - name: Commit and push version bump
+      uses: iam-kyle/verified-bot-commit@v1.2.0
+      with:
+        commit-message: 'chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]'
+        files: package.json pnpm-lock.yaml packages/*/package.json
+        push: 'true'
+    - name: Create GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh release create ${{ steps.version.outputs.new_version }} --title "${{ steps.version.outputs.new_version }}" --notes "Version bump to ${{ steps.version.outputs.new_version }}" --latest
+    - name: Update latest tag
       run: |-
-        git add package.json pnpm-lock.yaml packages/*/package.json
-        git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
-    - name: Ensure clean working tree
-      run: |-
-        if [ -n "$(git status --short)" ]; then
-          echo "Working tree is not clean:"
-          git status --short
-          exit 1
-        fi
-    - name: Tag and push
-      run: |-
-        git tag ${{ steps.version.outputs.new_version }}
         git tag -f latest
-        git push origin master
-        git push origin ${{ steps.version.outputs.new_version }}
         git push origin latest --force

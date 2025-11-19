@@ -45,13 +45,6 @@ jobs {
         run = "pnpm install --frozen-lockfile"
       }
       new {
-        name = "Configure git"
-        run = """
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          """
-      }
-      new {
         name = "Bump version"
         run = "pnpm -rc npm version --no-git-tag-version ${{ github.event.inputs.version }}"
       }
@@ -65,32 +58,28 @@ jobs {
       }
       new {
         name = "Clean install artifacts"
-        run =  "git clean -fdX"
+        run = "git clean -fdX"
       }
       new {
-        name = "Commit version bump"
-        run = """
-          git add package.json pnpm-lock.yaml packages/*/package.json
-          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
-          """
+        name = "Commit and push version bump"
+        uses = "iam-kyle/verified-bot-commit@v1.2.0"
+        with {
+          ["commit-message"] = "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
+          ["files"] = "package.json pnpm-lock.yaml packages/*/package.json"
+          ["push"] = "true"
+        }
       }
       new {
-        name = "Ensure clean working tree"
-        run = """
-          if [ -n "$(git status --short)" ]; then
-            echo "Working tree is not clean:"
-            git status --short
-            exit 1
-          fi
-          """
+        name = "Create GitHub Release"
+        run = "gh release create ${{ steps.version.outputs.new_version }} --title \"${{ steps.version.outputs.new_version }}\" --notes \"Version bump to ${{ steps.version.outputs.new_version }}\" --latest"
+        env = new {
+          ["GH_TOKEN"] = "${{ secrets.GITHUB_TOKEN }}"
+        }
       }
       new {
-        name = "Tag and push"
+        name = "Update latest tag"
         run = """
-          git tag ${{ steps.version.outputs.new_version }}
           git tag -f latest
-          git push origin master
-          git push origin ${{ steps.version.outputs.new_version }}
           git push origin latest --force
           """
       }
