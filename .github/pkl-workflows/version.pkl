@@ -52,7 +52,7 @@ jobs {
         name = "Get new version"
         id = "version"
         run = """
-          NEW_VERSION=$(node -p "require('./packages/finance-client/package.json').version")
+          NEW_VERSION=$(node -p "require('./package.json').version")
           echo "new_version=v$NEW_VERSION" >> $GITHUB_OUTPUT
           """
       }
