@@ -64,8 +64,12 @@ jobs {
         name = "Commit and push version bump"
         uses = "iarekylew00t/verified-bot-commit@v2"
         with {
-          ["commit-message"] = "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
-          ["files"] = "package.json pnpm-lock.yaml packages/*/package.json"
+          ["message"] = "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
+          ["files"] = """
+          package.json
+          pnpm-lock.yaml
+          packages/*/package.json
+          """
         }
       }
       new {
