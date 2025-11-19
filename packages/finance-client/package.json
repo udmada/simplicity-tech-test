@@ -1,6 +1,6 @@
 {
   "name": "@udmada/finance-client",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "type": "module",
   "description": "Personal finance client with DDD, Event-Driven architecture, and Effect",
   "keywords": [
