@@ -66,14 +66,14 @@
     "format:check": "pnpm exec prettier --check src tests"
   },
   "dependencies": {
-    "effect": "^3.19.2",
+    "effect": "^3.19.4",
     "plaid": "^39.1.0"
   },
   "devDependencies": {
-    "@types/node": "^24.10.0",
-    "@vitest/ui": "^4.0.8",
+    "@types/node": "^24.10.1",
+    "@vitest/ui": "^4.0.10",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.10"
   },
   "peerDependencies": {
     "effect": "^3.0.0"
