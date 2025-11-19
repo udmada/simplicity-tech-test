@@ -14,6 +14,10 @@ on {
 jobs {
   ["publish"] {
     environment = "publish-and-release"
+    permissions {
+      contents = "read"
+      `id-token` = "write"
+    }
     `runs-on` = new UbuntuLatest {}
     steps {
       new {
@@ -35,16 +39,6 @@ jobs {
       new {
         name = "Build packages"
         run = "pnpm build"
-      }
-      new {
-        name = "Setup .npmrc"
-        run = """
-          cat << EOF > .npmrc
-          //registry.npmjs.org/:_authToken=\(Context.secrets("NPM_TOKEN"))
-          registry=https://registry.npmjs.org/
-          always-auth=true
-          EOF
-          """
       }
       new {
         name = "Publish packages"

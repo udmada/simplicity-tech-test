@@ -9,6 +9,9 @@ name: Publish to npm
   workflow_dispatch: {}
 jobs:
   publish:
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     environment: publish-and-release
     steps:
@@ -22,12 +25,5 @@ jobs:
       run: pnpm test
     - name: Build packages
       run: pnpm build
-    - name: Setup .npmrc
-      run: |-
-        cat << EOF > .npmrc
-        //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-        registry=https://registry.npmjs.org/
-        always-auth=true
-        EOF
     - name: Publish packages
       run: pnpm -r publish --access public --no-git-checks
