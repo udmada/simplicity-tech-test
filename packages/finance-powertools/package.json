@@ -1,6 +1,6 @@
 {
   "name": "@udmada/finance-powertools",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "type": "module",
   "description": "Observability and resilience layers for Effect-based applications (inspired by AWS Lambda Powertools)",
   "keywords": [

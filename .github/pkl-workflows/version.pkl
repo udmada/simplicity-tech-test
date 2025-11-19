@@ -46,7 +46,10 @@ jobs {
       }
       new {
         name = "Bump version"
-        run = "pnpm -rc npm version --no-git-tag-version ${{ github.event.inputs.version }}"
+        run = """
+          npm version --no-git-tag-version ${{ github.event.inputs.version }}
+          pnpm -r exec npm version --no-git-tag-version ${{ github.event.inputs.version }}
+          """
       }
       new {
         name = "Get new version"
