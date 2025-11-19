@@ -40,11 +40,10 @@ jobs:
     - name: Clean install artifacts
       run: git clean -fdX
     - name: Commit and push version bump
-      uses: iam-kyle/verified-bot-commit@v1.2.0
+      uses: iarekylew00t/verified-bot-commit@v2
       with:
         commit-message: 'chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]'
         files: package.json pnpm-lock.yaml packages/*/package.json
-        push: 'true'
     - name: Create GitHub Release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
