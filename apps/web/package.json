@@ -48,5 +48,6 @@
     "cf-typegen": "wrangler types && react-router typegen",
     "deploy": "wrangler deploy"
   },
-  "type": "module"
+  "type": "module",
+  "version": "0.1.5"
 }
