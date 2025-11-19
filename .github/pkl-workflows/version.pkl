@@ -69,6 +69,7 @@ jobs {
           package.json
           pnpm-lock.yaml
           packages/*/package.json
+          apps/*/package.json
           """
         }
       }
