@@ -27,6 +27,7 @@ env {
 
 jobs {
   ["deploy"] {
+    environment = "publish-and-release"
     `runs-on` = new UbuntuLatest {}
     steps {
       new {

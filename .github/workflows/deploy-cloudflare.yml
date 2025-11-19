@@ -19,6 +19,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: publish-and-release
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
