@@ -16,6 +16,8 @@ name: Version & Tag
         - major
 jobs:
   version:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     environment: publish-and-release
     steps:

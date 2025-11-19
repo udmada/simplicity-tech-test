@@ -24,6 +24,9 @@ jobs {
   ["version"] {
     environment = "publish-and-release"
     `runs-on` = new UbuntuLatest {}
+    permissions {
+      contents = "write"
+    }
     steps {
       new {
         name = "Checkout code"
