@@ -6,8 +6,9 @@ name = "Publish to npm"
 
 on {
   workflow_dispatch {}
-  push {
-    tags { "v*" }
+  workflow_run {
+    workflows { "Version & Tag" }
+    types { "completed" }
   }
 }
 
@@ -19,6 +20,7 @@ jobs {
       `id-token` = "write"
     }
     `runs-on` = new UbuntuLatest {}
+    `if` = "${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}"
     steps {
       new {
         name = "Checkout code"
